@@ -1,2 +1,2 @@
 # StudentManagement
-java course study17
+Javaコースで作成する生徒管理システム用プロジェクト
