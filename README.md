@@ -1,2 +1,1 @@
-# StudentManagement
-Javaコースで作成する生徒管理システム用プロジェクト
+
