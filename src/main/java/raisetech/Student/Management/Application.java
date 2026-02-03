@@ -30,6 +30,7 @@ public class Application {
 		return student;
 	}
 
+
 	@PostMapping("/student")
 	public String postStudent(
 			@RequestParam String name,
