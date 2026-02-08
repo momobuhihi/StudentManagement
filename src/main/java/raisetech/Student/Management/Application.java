@@ -1,6 +1,5 @@
 package raisetech.Student.Management;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,32 +14,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Application {
 
-	@Autowired
-	private StudentRepository repository;
+  @Autowired
+  private StudentRepository repository;
 
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(Application.class, args);
+  }
 
-	@GetMapping("/student")
-	public List<Student> getStudents() {
-    return repository.findAll();
-	}
+  @GetMapping("/student")
+  public String getStudent(@RequestParam String name) {
+    Student student = repository.searchByName(name);
+    return student.getName() + "  " + student.getAge() + "歳";
+  }
 
 
-	@PostMapping("/student")
-	public void registerStudent(String name, int age) {
-		repository.registerStudent(name, age);
-	}
+  @PostMapping("/student")
+  public void registerStudent(String name, int age) {
+    repository.registerStudent(name, age);
+  }
 
-	@PatchMapping("/student")
-	public void updateStudent(String name, int age){
-repository.updateStudent(name, age);
-	}
+  @PatchMapping("/student")
+  public void updateStudent(String name, int age) {
+    repository.updateStudent(name, age);
+  }
 
-	@DeleteMapping("/student")
-	public void deleteStudent(String name){
-repository.deleteStudent(name);
-	}
+  @DeleteMapping("/student")
+  public void deleteStudent(String name) {
+    repository.deleteStudent(name);
+  }
 }
