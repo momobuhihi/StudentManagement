@@ -28,7 +28,6 @@ public class Application {
     return student.getName() + "  " + student.getAge() + "歳";
   }
 
-
   @PostMapping("/student")
   public void registerStudent(String name, int age) {
     repository.registerStudent(name, age);
@@ -43,4 +42,5 @@ public class Application {
   public void deleteStudent(String name) {
     repository.deleteStudent(name);
   }
+
 }
