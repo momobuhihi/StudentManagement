@@ -1,23 +1,20 @@
 package raisetech.Student.Management;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Student {
-   private String name;
-   private int age;
+
+  private String studentId;
+  private String studentName;
+  private String furigana;
+  private String nickname;
+  private String mailaddress;
+  private String region;
+  private int age;
+  private String gender;
 
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public int getAge() {
-    return age;
-  }
-
-  public void setAge(int age) {
-    this.age = age;
-  }
 }
