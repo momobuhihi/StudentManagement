@@ -26,6 +26,6 @@ public class Application {
 
   @GetMapping("/courseList")
   public List<Course> getCourseList() {
-    return repository.findAllcourses();
+    return repository.findAllCourses();
   }
 }
