@@ -9,6 +9,7 @@ import lombok.Setter;
 public class Course {
 
   private String courseId;
+  private Integer studentPk;
   private String studentId;
   private String courseName;
   private LocalDate startDate;
