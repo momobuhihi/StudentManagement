@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>受講生登録</title>
+</head>
+<body>
+
+<h1>受講生登録</h1>
+<form th:action="@{/registerStudent}" th:object="${studentDetail}" method="post">
+  <div>
+    <label for="studentName">名前:</label>
+    <input type="text" id="studentName" th:field="*{student.studentName}" required/>
+  </div>
+  <div>
+    <label>ふりがな:</label>
+    <input type="text" th:field="*{student.furigana}"/>
+  </div>
+  <div>
+    <label>ニックネーム:</label>
+    <input type="text" th:field="*{student.nickname}"/>
+  </div>
+  <div>
+    <label>電話番号:</label>
+    <input type="text" th:field="*{student.phoneNumber}"/>
+  </div>
+  <div>
+    <label>メール:</label>
+    <input type="text" th:field="*{student.mailaddress}"/>
+  </div>
+  <div>
+    <label>地域:</label>
+    <input type="text" th:field="*{student.region}"/>
+  </div>
+  <div>
+    <label>年齢:</label>
+    <input type="number" th:field="*{student.age}"/>
+  </div>
+  <div>
+    <label>性別:</label>
+    <input type="text" th:field="*{student.gender}"/>
+  </div>
+  <div>
+    <label>備考:</label>
+    <textarea th:field="*{student.remark}"></textarea>
+  </div>
+  <div>
+    <label>コース名:</label>
+    <input type="text" th:field="*{studentsCourse[0].courseName}"/>
+  </div>
+  <div>
+    <button type="submit">登録</button>
+  </div>
+</form>
+
+</body>
+</html>

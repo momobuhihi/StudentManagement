@@ -27,7 +27,7 @@
     <td colspan="3">
       <table border="1">
         <tr th:each="e : ${courseDetail.enrollments}">
-          <td th:text="${e.studentId}"></td>
+          <td th:text="${e.studentPk}"></td>
           <td th:text="${e.startDate}"></td>
           <td th:text="${e.endDate}"></td>
         </tr>

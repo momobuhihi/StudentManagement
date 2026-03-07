@@ -12,6 +12,5 @@ public class CourseDetail {
   private String courseId;
   private String courseName;
   private List<Course> enrollments;
-  ;
 
 }

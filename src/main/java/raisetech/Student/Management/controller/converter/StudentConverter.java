@@ -18,7 +18,7 @@ public class StudentConverter {
       studentDetail.setStudent(student);
 
       List<Course> convertCourses = courses.stream()
-          .filter(course -> student.getStudentId().equals(course.getStudentId()))
+          .filter(course -> student.getId().equals(course.getStudentPk()))
           .collect(Collectors.toList());
       studentDetail.setStudentsCourse((convertCourses));
       studentDetails.add(studentDetail);
