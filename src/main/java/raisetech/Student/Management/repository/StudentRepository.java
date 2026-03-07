@@ -3,7 +3,10 @@ package raisetech.Student.Management.repository;
 import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import raisetech.Student.Management.data.Course;
 import raisetech.Student.Management.data.Student;
 
@@ -27,20 +30,38 @@ public interface StudentRepository {
   @Select("SELECT * FROM students_courses")
   List<Course> searchCourses();
 
+  @Select("SELECT * FROM students WHERE id = #{id}")
+  Student searchStudent(@Param("id") int id);
+
   @Insert("""
       INSERT INTO students
         (student_name, furigana, nickname, phone_number, mailaddress, region, age, gender, remark, is_deleted)
       VALUES
         (#{studentName}, #{furigana}, #{nickname}, #{phoneNumber}, #{mailaddress}, #{region}, #{age}, #{gender}, #{remark}, false)
       """)
-  @org.apache.ibatis.annotations.Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+  @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
   void insertStudent(Student student);
 
   @Insert("""
       INSERT INTO students_courses
-        (student_pk, course_name, start_date, end_date)
+        (course_id, student_pk, course_name, start_date, end_date)
       VALUES
-        (#{studentPk}, #{courseName}, #{startDate}, #{endDate})
+        (#{courseId}, #{studentPk}, #{courseName}, #{startDate}, #{endDate})
       """)
   void insertCourse(Course course);
+
+  @Update("""
+        UPDATE students
+        SET student_name = #{studentName},
+            furigana = #{furigana},
+            nickname = #{nickname},
+            phone_number = #{phoneNumber},
+            mailaddress = #{mailaddress},
+            region = #{region},
+            age = #{age},
+            gender = #{gender},
+            remark = #{remark}
+        WHERE id = #{id}
+      """)
+  void updateStudent(Student student);
 }
