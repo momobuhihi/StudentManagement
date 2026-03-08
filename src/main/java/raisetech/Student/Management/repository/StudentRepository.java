@@ -33,6 +33,13 @@ public interface StudentRepository {
   @Select("SELECT * FROM students WHERE id = #{id}")
   Student searchStudent(@Param("id") int id);
 
+  @Select("""
+          SELECT id
+          FROM courses
+          WHERE course_name = #{courseName}
+      """)
+  Integer findCourseIdByName(String courseName);
+
   @Insert("""
       INSERT INTO students
         (student_name, furigana, nickname, phone_number, mailaddress, region, age, gender, remark, is_deleted)

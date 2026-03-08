@@ -50,24 +50,16 @@ public class StudentService {
     Course course = studentDetail.getStudentsCourse().get(0);
     course.setStudentPk(studentPk);
     // course_id埋め
-    course.setCourseId(toCourseId(course.getCourseName()));
+    Integer courseId = repository.findCourseIdByName(course.getCourseName());
+    if (courseId == null) {
+      throw new IllegalArgumentException("存在しないコース名です: " + course.getCourseName());
+    }
+    course.setCourseId(courseId);
 
     LocalDate start = LocalDate.now();
     course.setStartDate(start);
     course.setEndDate(start.plusMonths(6));
     repository.insertCourse(course);
-  }
-
-  private String toCourseId(String courseName) {
-    if (courseName == null) {
-      throw new IllegalArgumentException("courseName is null");
-    }
-
-    return switch (courseName) {
-      case "Javaコース" -> "1";
-      case "AWSコース" -> "2";
-      default -> throw new IllegalArgumentException("未知のコース名: " + courseName);
-    };
   }
 
   @Transactional
