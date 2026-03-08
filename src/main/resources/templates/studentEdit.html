@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>受講生更新</title>
+</head>
+<body>
+
+<h1>受講生更新</h1>
+<form th:action="@{/updateStudent}" th:object="${studentDetail}" method="post">
+
+  <input type="hidden" th:field="*{student.id}">
+
+  <div>
+    名前：<input type="text" th:field="*{student.studentName}">
+  </div>
+
+  <div>
+    ふりがな：<input type="text" th:field="*{student.furigana}">
+  </div>
+
+  <div>
+    ニックネーム：<input type="text" th:field="*{student.nickname}">
+  </div>
+
+  <div>
+    電話番号：<input type="text" th:field="*{student.phoneNumber}">
+  </div>
+
+  <div>
+    メールアドレス：<input type="text" th:field="*{student.mailaddress}">
+  </div>
+
+  <div>
+    地域：<input type="text" th:field="*{student.region}">
+  </div>
+
+  <div>
+    年齢：<input type="text" th:field="*{student.age}">
+  </div>
+
+  <div>
+    性別：<input type="text" th:field="*{student.gender}">
+  </div>
+
+  <div>
+    備考：<input type="text" th:field="*{student.remark}">
+  </div>
+
+  <button type="submit">更新</button>
+</form>
+
+</body>
+</html>
