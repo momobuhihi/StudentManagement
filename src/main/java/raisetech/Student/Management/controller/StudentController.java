@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import raisetech.Student.Management.controller.converter.CourseConverter;
 import raisetech.Student.Management.controller.converter.StudentConverter;
@@ -60,11 +61,20 @@ public class StudentController {
     if (result.hasErrors()) {
       return "registerStudent";
     }
-    //課題　新規受講生情報を登録する処理を実装する。
-    //コース情報の一緒に登録できるように実装する。コースは単体でいい。
     service.register(studentDetail);
     return "redirect:/studentList";
   }
-  
 
+  @GetMapping("/editStudent/{id}")
+  public String edit(@PathVariable int id, Model model) {
+    StudentDetail detail = service.searchStudent(id);
+    model.addAttribute("studentDetail", detail);
+    return "studentEdit";
+  }
+
+  @PostMapping("/updateStudent")
+  public String updateStudent(@ModelAttribute StudentDetail studentDetail) {
+    service.updateStudent(studentDetail);
+    return "redirect:/studentList";
+  }
 }
