@@ -45,6 +45,12 @@
             th:text="${course.courseName} + ' '">Javaコース</span>
     </td>
     <td th:text="${studentDetail.student.remark}">特になし</td>
+
+    <td>
+      <form th:action="@{/deleteStudent/{id}(id=${studentDetail.student.id})}" method="post">
+        <button type="submit">削除</button>
+      </form>
+    </td>
   </tr>
   </tbody>
 </table>

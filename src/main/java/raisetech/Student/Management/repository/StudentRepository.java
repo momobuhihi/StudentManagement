@@ -24,7 +24,7 @@ public interface StudentRepository {
    *
    * @return 全件検索した受講生情報の一覧
    */
-  @Select("SELECT * FROM students")
+  @Select("SELECT * FROM students WHERE is_deleted = FALSE")
   List<Student> search();
 
   @Select("SELECT * FROM students_courses")
@@ -71,4 +71,7 @@ public interface StudentRepository {
         WHERE id = #{id}
       """)
   void updateStudent(Student student);
+
+  @Update("UPDATE students SET is_deleted = TRUE WHERE id = #{id}")
+  void deleteStudent(int id);
 }
