@@ -47,6 +47,13 @@
     備考：<input type="text" th:field="*{student.remark}">
   </div>
 
+  <input type="hidden" th:field="*{studentsCourse[0].studentPk}">
+  <input type="hidden" th:field="*{studentsCourse[0].courseId}">
+
+  <div>
+    コース名：<input type="text" th:field="*{studentsCourse[0].courseName}">
+  </div>
+
   <button type="submit">更新</button>
 </form>
 

@@ -32,8 +32,10 @@ public class StudentService {
 
   public StudentDetail searchStudent(int id) {
     Student student = repository.searchStudent(id);
+    List<Course> courses = repository.searchStudentCourses(id);
     StudentDetail detail = new StudentDetail();
     detail.setStudent(student);
+    detail.setStudentsCourse(courses);
     return detail;
   }
 
@@ -65,5 +67,10 @@ public class StudentService {
   @Transactional
   public void updateStudent(StudentDetail studentDetail) {
     repository.updateStudent(studentDetail.getStudent());
+    if (studentDetail.getStudentsCourse() != null && !studentDetail.getStudentsCourse().isEmpty()) {
+      Course course = studentDetail.getStudentsCourse().get(0);
+      course.setStudentPk(studentDetail.getStudent().getId());
+      repository.updateCourse(course);
+    }
   }
 }

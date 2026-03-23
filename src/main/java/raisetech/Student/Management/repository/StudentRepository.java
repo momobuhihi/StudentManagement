@@ -33,6 +33,9 @@ public interface StudentRepository {
   @Select("SELECT * FROM students WHERE id = #{id}")
   Student searchStudent(@Param("id") int id);
 
+  @Select("SELECT * FROM students_courses WHERE student_pk = #{studentPk}")
+  List<Course> searchStudentCourses(@Param("studentPk") int studentPk);
+
   @Select("""
           SELECT id
           FROM courses
@@ -71,4 +74,7 @@ public interface StudentRepository {
         WHERE id = #{id}
       """)
   void updateStudent(Student student);
+
+  @Update("UPDATE students_courses SET course_name = #{courseName} WHERE student_pk = #{studentPk}")
+  void updateCourse(Course course);
 }

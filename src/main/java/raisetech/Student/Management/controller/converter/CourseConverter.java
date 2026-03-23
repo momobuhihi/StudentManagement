@@ -13,7 +13,7 @@ public class CourseConverter {
 
   public List<CourseDetail> convertCourseDetails(List<Course> enrollments) {
 
-    Map<String, List<Course>> grouped =
+    Map<Integer, List<Course>> grouped =
         enrollments.stream()
             .collect(Collectors.groupingBy(Course::getCourseId));
 
