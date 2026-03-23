@@ -9,7 +9,7 @@ import raisetech.Student.Management.data.Course;
 @Setter
 public class CourseDetail {
 
-  private String courseId;
+  private Integer courseId;
   private String courseName;
   private List<Course> enrollments;
 

@@ -18,19 +18,13 @@ import raisetech.Student.Management.data.Student;
 @Mapper
 public interface StudentRepository {
 
-
-  /**
-   * 全件検索します。
-   *
-   * @return 全件検索した受講生情報の一覧
-   */
-  @Select("SELECT * FROM students")
+  @Select("SELECT * FROM students WHERE is_deleted = FALSE")
   List<Student> search();
 
   @Select("SELECT * FROM students_courses")
   List<Course> searchCourses();
 
-  @Select("SELECT * FROM students WHERE id = #{id}")
+  @Select("SELECT * FROM students WHERE id = #{id} AND is_deleted = FALSE")
   Student searchStudent(@Param("id") int id);
 
   @Select("""
@@ -71,4 +65,7 @@ public interface StudentRepository {
         WHERE id = #{id}
       """)
   void updateStudent(Student student);
+
+  @Update("UPDATE students SET is_deleted = TRUE WHERE id = #{id}")
+  void deleteStudent(int id);
 }
