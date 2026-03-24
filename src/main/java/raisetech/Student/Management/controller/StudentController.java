@@ -77,4 +77,10 @@ public class StudentController {
     service.updateStudent(studentDetail);
     return "redirect:/studentList";
   }
+
+  @PostMapping("/deleteStudent/{id}")
+  public String deleteStudent(@PathVariable int id) {
+    service.deleteStudent(id);
+    return "redirect:/studentList";
+  }
 }
