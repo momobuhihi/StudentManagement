@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="raisetech.Student.Management.repository.StudentRepository">
+
+  <!-- 在籍受講生の全件検索 -->
+  <select id="search" resultType="raisetech.Student.Management.data.Student">
+    SELECT * FROM students WHERE is_deleted = FALSE
+  </select>
+
+  <!-- 在籍受講生の検索 -->
+  <select id="searchStudent" resultType="raisetech.Student.Management.data.Student">
+    SELECT * FROM students WHERE id = #{id} AND is_deleted = FALSE
+  </select>
+
+  <!-- 受講生のコース情報の全件検索 -->
+  <select id="searchCourses" resultType="raisetech.Student.Management.data.CourseList">
+    SELECT * FROM students_courses
+  </select>
+
+  <!-- 受講生IDに紐づく受講生コース情報の検索 -->
+  <select id="searchStudentCourses" resultType="raisetech.Student.Management.data.CourseList">
+    SELECT * FROM students_courses WHERE student_pk = #{studentPk}
+  </select>
+
+  <!-- コース名からコースIDを取得 -->
+  <select id="findCourseIdByName" resultType="int">
+    SELECT id FROM courses WHERE course_name = #{courseName}
+  </select>
+
+  <!-- 受講生の新規登録 　受講生IDに関しては自動採番を行う -->
+  <insert id="insertStudent" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO students (student_name, furigana, nickname, phone_number, mailaddress, region, age,
+    gender, remark, is_deleted)
+    VALUES (#{studentName}, #{furigana}, #{nickname}, #{phoneNumber}, #{mailaddress}, #{region},
+    #{age}, #{gender}, #{remark}, false)
+  </insert>
+
+  <!-- 受講生コース情報の新規登録　受講生IDに関しては自動採番を行う -->
+  <insert id="insertCourse">
+    INSERT INTO students_courses (course_id, student_pk, course_name, start_date, end_date)
+    VALUES (#{courseId}, #{studentPk}, #{courseName}, #{startDate}, #{endDate})
+  </insert>
+
+  <!-- 受講生の更新 -->
+  <update id="updateStudent">
+    UPDATE students SET student_name = #{studentName},
+    furigana = #{furigana},
+    nickname = #{nickname},
+    phone_number = #{phoneNumber},
+    mailaddress = #{mailaddress},
+    region = #{region},
+    age = #{age},
+    gender = #{gender},
+    remark = #{remark}
+    WHERE id = #{id}
+  </update>
+
+  <!-- 受講生コース情報のコース名を更新 -->
+  <update id="updateCourse">
+    UPDATE students_courses SET course_name = #{courseName} WHERE student_pk = #{studentPk}
+  </update>
+
+  <!-- 受講生の論理的削除 -->
+  <update id="deleteStudent">
+    UPDATE students SET is_deleted = true WHERE id = #{id}
+  </update>
+
+  <!-- 論理的削除した受講生の復元 -->
+  <update id="restoreStudent">
+    UPDATE students SET is_deleted = false WHERE id = #{id}
+  </update>
+</mapper>

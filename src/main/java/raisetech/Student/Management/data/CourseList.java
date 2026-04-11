@@ -1,5 +1,6 @@
 package raisetech.Student.Management.data;
 
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +11,8 @@ public class CourseList {
 
   private Integer courseId;
   private Integer studentPk;
+
+  @NotBlank
   private String courseName;
   private LocalDate startDate;
   private LocalDate endDate;

@@ -51,7 +51,7 @@ public class StudentService {
       throw new IllegalArgumentException("studentDetail or student is null");
     }
     Integer studentPk = insertStudent(studentDetail);
-    CourseList courseList = initstudentcourse(studentDetail, studentPk);
+    CourseList courseList = initStudentCourse(studentDetail, studentPk);
     repository.insertCourse(courseList);
     return studentDetail;
   }
@@ -63,7 +63,7 @@ public class StudentService {
    * @param studentPk
    * @return
    */
-  private @NonNull CourseList initstudentcourse(StudentDetail studentDetail, Integer studentPk) {
+  private @NonNull CourseList initStudentCourse(StudentDetail studentDetail, Integer studentPk) {
     CourseList course = studentDetail.getStudentsCourse().get(0);
     course.setStudentPk(studentPk);
 
@@ -102,5 +102,10 @@ public class StudentService {
   @Transactional
   public void deleteStudent(int id) {
     repository.deleteStudent(id);
+  }
+
+  @Transactional
+  public void restoreStudent(int id) {
+    repository.restoreStudent(id);
   }
 }

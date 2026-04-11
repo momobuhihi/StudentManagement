@@ -1,9 +1,11 @@
 package raisetech.Student.Management.controller;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +23,7 @@ import raisetech.Student.Management.service.StudentService;
 /**
  * 受講生の検索や登録、更新などを行うREST　APIとして実行されるControllerです。
  */
+@Validated
 @RestController
 public class StudentController {
 
@@ -55,20 +58,18 @@ public class StudentController {
    * @return　受講生
    */
   @GetMapping("/student/{id}")
-  public StudentDetail getStudent(@PathVariable int id) {
+  public StudentDetail getStudent(@PathVariable @Positive int id) {
     return service.searchStudent(id);
   }
 
+  /**
+   * コース情報の全件検索です。
+   *
+   * @return
+   */
   @GetMapping("/courseList")
   public List<CourseDetail> getCourseList() {
-    List<CourseList> enrollments = service.searchCourseList();
-    return courseconverter.convertCourseDetails(enrollments);
-  }
-
-  @GetMapping("/newStudent")
-  public String newStudent(Model model) {
-    model.addAttribute("studentDetail", new StudentDetail());
-    return "registerStudent";
+    return courseconverter.convertCourseDetails(service.searchCourseList());
   }
 
   /**
@@ -78,14 +79,10 @@ public class StudentController {
    * @return　登録情報を付与した受講生詳細
    */
   @PostMapping("/registerStudent")
-  public ResponseEntity<StudentDetail> registerStudent(@RequestBody StudentDetail studentDetail) {
+  public ResponseEntity<StudentDetail> registerStudent(
+      @RequestBody @Valid StudentDetail studentDetail) {
     StudentDetail responseStudentDetail = service.register(studentDetail);
     return ResponseEntity.ok(responseStudentDetail);
-  }
-
-  @GetMapping("/editStudent/{id}")
-  public StudentDetail edit(@PathVariable int id) {
-    return service.searchStudent(id);
   }
 
   /**
@@ -95,7 +92,7 @@ public class StudentController {
    * @return　実行結果
    */
   @PutMapping("/updateStudent")
-  public ResponseEntity<String> updateStudent(@RequestBody StudentDetail studentDetail) {
+  public ResponseEntity<String> updateStudent(@RequestBody @Valid StudentDetail studentDetail) {
     service.updateStudent(studentDetail);
     return ResponseEntity.ok("更新処理が成功しました。");
   }
@@ -107,8 +104,20 @@ public class StudentController {
    * @return　実行結果
    */
   @PostMapping("/deleteStudent/{id}")
-  public ResponseEntity<String> deleteStudent(@PathVariable int id) {
+  public ResponseEntity<String> deleteStudent(@PathVariable @Positive int id) {
     service.deleteStudent(id);
     return ResponseEntity.ok("削除処理が成功しました。");
+  }
+
+  /**
+   * 受講生の復元を行います。
+   *
+   * @param id 受講生ID
+   * @return　実行結果
+   */
+  @PostMapping("/restoreStudent/{id}")
+  public ResponseEntity<String> restoreStudent(@PathVariable @Positive int id) {
+    service.restoreStudent(id);
+    return ResponseEntity.ok("復元処理が成功しました。");
   }
 }
