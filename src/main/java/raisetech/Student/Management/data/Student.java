@@ -27,7 +27,7 @@ public class Student {
   @Size(max = 50)
   private String nickname;
 
-  @Pattern(regexp = "^(0\\d{9,10}|0\\d{1,4}-\\d{1,4}-\\d{4})$", message = "電話番号はハイフンあり・なしどちらでも入力できます")
+  @Pattern(regexp = "^(0\\d{9,10}|0\\d{1,4}-\\d{1,4}-\\d{4})$")
   private String phoneNumber;
 
   @NotBlank
