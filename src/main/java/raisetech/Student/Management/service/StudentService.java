@@ -6,6 +6,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import raisetech.Student.Management.controller.handler.TestException;
 import raisetech.Student.Management.data.CourseList;
 import raisetech.Student.Management.data.Student;
 import raisetech.Student.Management.domain.StudentDetail;
@@ -69,7 +70,7 @@ public class StudentService {
 
     Integer courseId = repository.findCourseIdByName(course.getCourseName());
     if (courseId == null) {
-      throw new IllegalArgumentException("存在しないコース名です: " + course.getCourseName());
+      throw new TestException("registerStudentでテスト例外が発生しました。");
     }
     course.setCourseId(courseId);
     LocalDate start = LocalDate.now();

@@ -6,7 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -14,8 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.Student.Management.controller.converter.CourseConverter;
 import raisetech.Student.Management.controller.converter.StudentConverter;
-import raisetech.Student.Management.data.CourseList;
-import raisetech.Student.Management.data.Student;
+import raisetech.Student.Management.controller.handler.TestException;
 import raisetech.Student.Management.domain.CourseDetail;
 import raisetech.Student.Management.domain.StudentDetail;
 import raisetech.Student.Management.service.StudentService;
@@ -46,9 +47,7 @@ public class StudentController {
    */
   @GetMapping("/studentList")
   public List<StudentDetail> getStudentList() {
-    List<Student> students = service.searchStudentList();
-    List<CourseList> courses = service.searchCourseList();
-    return converter.convertStudentDetails(students, courses);
+    return converter.convertStudentDetails(service.searchStudentList(), service.searchCourseList());
   }
 
   /**
@@ -103,7 +102,7 @@ public class StudentController {
    * @param id 受講生ID
    * @return　実行結果
    */
-  @PostMapping("/deleteStudent/{id}")
+  @DeleteMapping("/deleteStudent/{id}")
   public ResponseEntity<String> deleteStudent(@PathVariable @Positive int id) {
     service.deleteStudent(id);
     return ResponseEntity.ok("削除処理が成功しました。");
@@ -115,9 +114,14 @@ public class StudentController {
    * @param id 受講生ID
    * @return　実行結果
    */
-  @PostMapping("/restoreStudent/{id}")
+  @PatchMapping("/restoreStudent/{id}")
   public ResponseEntity<String> restoreStudent(@PathVariable @Positive int id) {
     service.restoreStudent(id);
     return ResponseEntity.ok("復元処理が成功しました。");
+  }
+
+  @GetMapping("/testException")
+  public String testException() {
+    throw new TestException("テスト用の例外です。");
   }
 }
