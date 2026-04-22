@@ -19,9 +19,12 @@ import raisetech.Student.Management.data.Student;
 @AllArgsConstructor
 public class StudentDetail {
 
+  @Schema(description = "単一受講生詳細")
   @NotNull
   @Valid
   private Student student;
+
+  @Schema(description = "全受講生コース情報一覧")
   @NotEmpty
   @Valid
   private List<Course> studentsCourse;
