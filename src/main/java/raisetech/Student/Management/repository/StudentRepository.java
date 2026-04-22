@@ -3,7 +3,7 @@ package raisetech.Student.Management.repository;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import raisetech.Student.Management.data.CourseList;
+import raisetech.Student.Management.data.Course;
 import raisetech.Student.Management.data.Student;
 
 /**
@@ -24,7 +24,7 @@ public interface StudentRepository {
    *
    * @return　受講生のコース情報（全件）
    */
-  List<CourseList> searchCourses();
+  List<Course> searchCourses();
 
   /**
    * 在籍受講生の検索を行います。
@@ -40,7 +40,7 @@ public interface StudentRepository {
    * @param studentPk 受講生ID
    * @return　受講生IDに紐づく受講生コース情報
    */
-  List<CourseList> searchStudentCourses(@Param("studentPk") int studentPk);
+  List<Course> searchStudentCourses(@Param("studentPk") int studentPk);
 
   /**
    * コース名からコースIDを取得します。
@@ -62,7 +62,7 @@ public interface StudentRepository {
    *
    * @param course 受講生コース情報
    */
-  void insertCourse(CourseList course);
+  void insertCourse(Course course);
 
   /**
    * 受講生を更新します。
@@ -76,7 +76,7 @@ public interface StudentRepository {
    *
    * @param course 受講生コース情報
    */
-  void updateCourse(CourseList course);
+  void updateCourse(Course course);
 
   /**
    * 受講生を論理的削除します。

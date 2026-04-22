@@ -14,12 +14,12 @@
   </select>
 
   <!-- 受講生のコース情報の全件検索 -->
-  <select id="searchCourses" resultType="raisetech.Student.Management.data.CourseList">
+  <select id="searchCourses" resultType="raisetech.Student.Management.data.Course">
     SELECT * FROM students_courses
   </select>
 
   <!-- 受講生IDに紐づく受講生コース情報の検索 -->
-  <select id="searchStudentCourses" resultType="raisetech.Student.Management.data.CourseList">
+  <select id="searchStudentCourses" resultType="raisetech.Student.Management.data.Course">
     SELECT * FROM students_courses WHERE student_pk = #{studentPk}
   </select>
 

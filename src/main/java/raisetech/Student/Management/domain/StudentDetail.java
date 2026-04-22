@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import raisetech.Student.Management.data.CourseList;
+import raisetech.Student.Management.data.Course;
 import raisetech.Student.Management.data.Student;
 
 @Schema(description = "受講生詳細")
@@ -24,5 +24,5 @@ public class StudentDetail {
   private Student student;
   @NotEmpty
   @Valid
-  private List<CourseList> studentsCourse;
+  private List<Course> studentsCourse;
 }
