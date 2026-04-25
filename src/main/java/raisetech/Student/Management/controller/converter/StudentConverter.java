@@ -2,7 +2,7 @@ package raisetech.Student.Management.controller.converter;
 
 import java.util.List;
 import org.springframework.stereotype.Component;
-import raisetech.Student.Management.data.CourseList;
+import raisetech.Student.Management.data.Course;
 import raisetech.Student.Management.data.Student;
 import raisetech.Student.Management.domain.StudentDetail;
 
@@ -17,10 +17,10 @@ public class StudentConverter {
    * @return　受講生詳細情報のリスト
    */
   public List<StudentDetail> convertStudentDetails(List<Student> students,
-      List<CourseList> courses) {
+      List<Course> courses) {
     return students.stream()
         .map(student -> {
-          List<CourseList> convertCourses = courses.stream()
+          List<Course> convertCourses = courses.stream()
               .filter(course -> student.getId().equals(course.getStudentPk()))
               .toList();
 

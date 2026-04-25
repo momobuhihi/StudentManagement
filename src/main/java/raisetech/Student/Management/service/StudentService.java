@@ -6,8 +6,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import raisetech.Student.Management.controller.handler.TestException;
-import raisetech.Student.Management.data.CourseList;
+import raisetech.Student.Management.data.Course;
 import raisetech.Student.Management.data.Student;
 import raisetech.Student.Management.domain.StudentDetail;
 import raisetech.Student.Management.repository.StudentRepository;
@@ -29,7 +28,7 @@ public class StudentService {
     return repository.search();
   }
 
-  public List<CourseList> searchCourseList() {
+  public List<Course> searchCourseList() {
     return repository.searchCourses();
   }
 
@@ -41,7 +40,7 @@ public class StudentService {
    */
   public StudentDetail searchStudent(int id) {
     Student student = repository.searchStudent(id);
-    List<CourseList> courses = repository.searchStudentCourses(id);
+    List<Course> courses = repository.searchStudentCourses(id);
     return new StudentDetail(student, courses);
   }
 
@@ -52,7 +51,7 @@ public class StudentService {
       throw new IllegalArgumentException("studentDetail or student is null");
     }
     Integer studentPk = insertStudent(studentDetail);
-    CourseList courseList = initStudentCourse(studentDetail, studentPk);
+    Course courseList = initStudentCourse(studentDetail, studentPk);
     repository.insertCourse(courseList);
     return studentDetail;
   }
@@ -64,13 +63,13 @@ public class StudentService {
    * @param studentPk
    * @return
    */
-  private @NonNull CourseList initStudentCourse(StudentDetail studentDetail, Integer studentPk) {
-    CourseList course = studentDetail.getStudentsCourse().get(0);
+  private @NonNull Course initStudentCourse(StudentDetail studentDetail, Integer studentPk) {
+    Course course = studentDetail.getStudentsCourse().get(0);
     course.setStudentPk(studentPk);
 
     Integer courseId = repository.findCourseIdByName(course.getCourseName());
     if (courseId == null) {
-      throw new TestException("registerStudentでテスト例外が発生しました。");
+      throw new IllegalArgumentException("存在しないコース名です: " + course.getCourseName());
     }
     course.setCourseId(courseId);
     LocalDate start = LocalDate.now();
@@ -94,7 +93,7 @@ public class StudentService {
     Student student = studentDetail.getStudent();
     repository.updateStudent(student);
     if (studentDetail.getStudentsCourse() != null && !studentDetail.getStudentsCourse().isEmpty()) {
-      CourseList courseList = studentDetail.getStudentsCourse().get(0);
+      Course courseList = studentDetail.getStudentsCourse().get(0);
       courseList.setStudentPk(student.getId());
       repository.updateCourse(courseList);
     }

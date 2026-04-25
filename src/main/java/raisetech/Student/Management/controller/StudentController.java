@@ -1,5 +1,7 @@
 package raisetech.Student.Management.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import java.util.List;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.Student.Management.controller.converter.CourseConverter;
 import raisetech.Student.Management.controller.converter.StudentConverter;
-import raisetech.Student.Management.controller.handler.TestException;
 import raisetech.Student.Management.domain.CourseDetail;
 import raisetech.Student.Management.domain.StudentDetail;
 import raisetech.Student.Management.service.StudentService;
@@ -45,6 +46,7 @@ public class StudentController {
    *
    * @return 受講生一覧（全件）
    */
+  @Operation(summary = "一覧検索", description = "受講生の一覧を検索します。", tags = {"Student"})
   @GetMapping("/studentList")
   public List<StudentDetail> getStudentList() {
     return converter.convertStudentDetails(service.searchStudentList(), service.searchCourseList());
@@ -56,6 +58,8 @@ public class StudentController {
    * @param id 受講生ID
    * @return　受講生
    */
+  @Operation(summary = "単体検索", description = "IDを指定して学生情報を1件取得します。", tags = {
+      "Student"})
   @GetMapping("/student/{id}")
   public StudentDetail getStudent(@PathVariable @Positive int id) {
     return service.searchStudent(id);
@@ -66,6 +70,8 @@ public class StudentController {
    *
    * @return
    */
+  @Operation(summary = "コース情報一覧検索", description = "コース情報一覧を検索します。", tags = {
+      "Course"})
   @GetMapping("/courseList")
   public List<CourseDetail> getCourseList() {
     return courseconverter.convertCourseDetails(service.searchCourseList());
@@ -77,6 +83,7 @@ public class StudentController {
    * @param studentDetail 受講生詳細
    * @return　登録情報を付与した受講生詳細
    */
+  @Operation(summary = "受講生登録", description = "受講生を登録します。", tags = {"Student"})
   @PostMapping("/registerStudent")
   public ResponseEntity<StudentDetail> registerStudent(
       @RequestBody @Valid StudentDetail studentDetail) {
@@ -90,6 +97,8 @@ public class StudentController {
    * @param studentDetail 受講生詳細
    * @return　実行結果
    */
+  @Operation(summary = "受講生更新", description = "受講生を更新します。", tags = {
+      "Student"}, responses = {@ApiResponse(responseCode = "200", description = "更新成功")})
   @PutMapping("/updateStudent")
   public ResponseEntity<String> updateStudent(@RequestBody @Valid StudentDetail studentDetail) {
     service.updateStudent(studentDetail);
@@ -102,6 +111,7 @@ public class StudentController {
    * @param id 受講生ID
    * @return　実行結果
    */
+  @Operation(summary = "受講生削除", description = "受講生を論理的削除します。", tags = {"Student"})
   @DeleteMapping("/deleteStudent/{id}")
   public ResponseEntity<String> deleteStudent(@PathVariable @Positive int id) {
     service.deleteStudent(id);
@@ -114,14 +124,11 @@ public class StudentController {
    * @param id 受講生ID
    * @return　実行結果
    */
+  @Operation(summary = "受講生復元", description = "論理的削除した受講生を復元します。", tags = {
+      "Student"})
   @PatchMapping("/restoreStudent/{id}")
   public ResponseEntity<String> restoreStudent(@PathVariable @Positive int id) {
     service.restoreStudent(id);
     return ResponseEntity.ok("復元処理が成功しました。");
-  }
-
-  @GetMapping("/testException")
-  public String testException() {
-    throw new TestException("テスト用の例外です。");
   }
 }
