@@ -44,7 +44,12 @@ public class StudentService {
     return new StudentDetail(student, courses);
   }
 
-
+  /**
+   * 受講生登録です。
+   *
+   * @param studentDetail
+   * @return
+   */
   @Transactional
   public StudentDetail register(StudentDetail studentDetail) {
     if (studentDetail == null || studentDetail.getStudent() == null) {
