@@ -2,8 +2,8 @@ package raisetech.Student.Management.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import raisetech.Student.Management.controller.converter.StudentConverter;
 import raisetech.Student.Management.data.Course;
 import raisetech.Student.Management.data.Student;
 import raisetech.Student.Management.domain.StudentDetail;
@@ -27,14 +26,10 @@ class StudentServiceTest {
   @Mock
   private StudentRepository repository;
 
-  @Mock
-  private StudentConverter converter;
-
   private StudentService sut;
 
   @BeforeEach
   void before() {
-    repository = mock(StudentRepository.class);
     sut = new StudentService(repository);
   }
 
@@ -43,7 +38,10 @@ class StudentServiceTest {
     List<Student> expected = new ArrayList<>();
     when(repository.search()).thenReturn(expected);
 
-    sut.searchStudentList();
+    List<Student> actual = sut.searchStudentList();
+
+    assertEquals(expected, actual);
+    verify(repository).search();
   }
 
   @Test
@@ -74,11 +72,30 @@ class StudentServiceTest {
 
     when(repository.findCourseIdByName("Javaコース")).thenReturn(1);
     StudentDetail actual = sut.register(studentDetail);
-    assertEquals(studentDetail, actual);
+    assertEquals(1, actual.getStudent().getId());
+    assertEquals("Javaコース", actual.getStudentsCourse().get(0).getCourseName());
 
     verify(repository).insertStudent(student);
     verify(repository).findCourseIdByName("Javaコース");
     verify(repository).insertCourse(course);
+  }
+
+  @Test
+  void studentDetailがnullの場合は例外が発生すること() {
+    assertThrows(IllegalArgumentException.class, () -> {
+      sut.register(null);
+    });
+    verify(repository, never()).insertStudent(any());
+  }
+
+  @Test
+  void studentがnullの場合は例外が発生すること() {
+    StudentDetail studentDetail = new StudentDetail(null, List.of(new Course()));
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      sut.register(studentDetail);
+    });
+    verify(repository, never()).insertStudent(any());
   }
 
   @Test
@@ -137,5 +154,26 @@ class StudentServiceTest {
     assertNotNull(course.getEndDate());
 
     verify(repository).insertCourse(course);
+  }
+
+  @Test
+  void 存在しないコース名の場合は例外が発生すること() {
+    Student student = new Student();
+    student.setId(1);
+
+    Course course = new Course();
+    course.setCourseName("存在しないコース");
+
+    StudentDetail studentDetail = new StudentDetail(student, List.of(course));
+
+    when(repository.findCourseIdByName("存在しないコース")).thenReturn(null);
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      sut.register(studentDetail);
+    });
+
+    verify(repository).insertStudent(student);
+    verify(repository).findCourseIdByName("存在しないコース");
+    verify(repository, never()).insertCourse(any());
   }
 }
