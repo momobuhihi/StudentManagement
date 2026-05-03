@@ -44,6 +44,23 @@ public class StudentService {
     return new StudentDetail(student, courses);
   }
 
+  /**
+   * 受講生をDBに登録し、自動採番されたIDを取得する
+   *
+   * @param studentDetail 登録対象の受講生情報
+   * @return 登録後に採番された受講生ID
+   */
+  private Integer insertStudent(StudentDetail studentDetail) {
+    repository.insertStudent(studentDetail.getStudent());
+    return studentDetail.getStudent().getId();
+  }
+
+  /**
+   * 受講生とコース情報を登録する 受講生IDは自動採番され、コース情報に紐付けられる
+   *
+   * @param studentDetail 登録する受講生情報
+   * @return　登録された受講生
+   */
   @Transactional
   public StudentDetail register(StudentDetail studentDetail) {
     if (studentDetail == null || studentDetail.getStudent() == null) {
@@ -75,11 +92,6 @@ public class StudentService {
     course.setStartDate(start);
     course.setEndDate(start.plusMonths(6));
     return course;
-  }
-
-  private Integer insertStudent(StudentDetail studentDetail) {
-    repository.insertStudent(studentDetail.getStudent());
-    return studentDetail.getStudent().getId();
   }
 
   /**
