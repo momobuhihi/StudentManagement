@@ -46,33 +46,34 @@ class StudentServiceTest {
 
   @Test
   void 受講生の単一検索が動作すること() {
-    int id = 1;
+    int sID = 1;
 
     Student student = new Student();
     List<Course> courses = new ArrayList<>();
-    when(repository.searchStudent(id)).thenReturn(student);
-    when(repository.searchStudentCourses(id)).thenReturn(courses);
+    when(repository.searchStudent(sID)).thenReturn(student);
+    when(repository.searchStudentCourses(sID)).thenReturn(courses);
 
-    StudentDetail actual = sut.searchStudent(id);
+    StudentDetail actual = sut.searchStudent(sID);
 
     assertEquals(student, actual.getStudent());
     assertEquals(courses, actual.getStudentsCourse());
 
-    verify(repository).searchStudent(id);
-    verify(repository).searchStudentCourses(id);
+    verify(repository).searchStudent(sID);
+    verify(repository).searchStudentCourses(sID);
   }
 
   @Test
   void 受講生の登録が動作すること() {
+    int sID = 100;
     Student student = new Student();
-    student.setId(1);
+    student.setId(sID);
     Course course = new Course();
     course.setCourseName("Javaコース");
     StudentDetail studentDetail = new StudentDetail(student, List.of(course));
 
-    when(repository.findCourseIdByName("Javaコース")).thenReturn(1);
+    when(repository.findCourseIdByName("Javaコース")).thenReturn(sID);
     StudentDetail actual = sut.register(studentDetail);
-    assertEquals(1, actual.getStudent().getId());
+    assertEquals(sID, actual.getStudent().getId());
     assertEquals("Javaコース", actual.getStudentsCourse().get(0).getCourseName());
 
     verify(repository).insertStudent(student);
@@ -100,8 +101,9 @@ class StudentServiceTest {
 
   @Test
   void 受講生の更新が動作すること() {
+    int sID = 100;
     Student student = new Student();
-    student.setId(1);
+    student.setId(sID);
     Course course = new Course();
     course.setCourseName("Javaコース");
     StudentDetail studentDetail = new StudentDetail(student, List.of(course));
@@ -109,14 +111,15 @@ class StudentServiceTest {
     sut.updateStudent(studentDetail);
 
     verify(repository).updateStudent(student);
-    assertEquals(1, course.getStudentPk());
+    assertEquals(sID, course.getStudentPk());
     verify(repository).updateCourse(course);
   }
 
   @Test
   void コースがnullの場合はコース更新が動作しないこと() {
+    int sID = 100;
     Student student = new Student();
-    student.setId(1);
+    student.setId(sID);
     StudentDetail studentDetail = new StudentDetail(student, null);
 
     sut.updateStudent(studentDetail);
@@ -127,8 +130,9 @@ class StudentServiceTest {
 
   @Test
   void コースが空の場合はコース更新が動作しないこと() {
+    int sID = 100;
     Student student = new Student();
-    student.setId(1);
+    student.setId(sID);
     StudentDetail studentDetail = new StudentDetail(student, List.of());
 
     sut.updateStudent(studentDetail);
@@ -139,17 +143,19 @@ class StudentServiceTest {
 
   @Test
   void コース情報が正しく初期化されること() {
+    int sID = 100;
+    int cID = 900;
     Student student = new Student();
-    student.setId(1);
+    student.setId(sID);
     Course course = new Course();
     course.setCourseName("Javaコース");
     StudentDetail studentDetail = new StudentDetail(student, List.of(course));
 
-    when(repository.findCourseIdByName("Javaコース")).thenReturn(100);
+    when(repository.findCourseIdByName("Javaコース")).thenReturn(cID);
     sut.register(studentDetail);
 
-    assertEquals(1, course.getStudentPk());
-    assertEquals(100, course.getCourseId());
+    assertEquals(sID, course.getStudentPk());
+    assertEquals(cID, course.getCourseId());
     assertNotNull(course.getStartDate());
     assertNotNull(course.getEndDate());
 
@@ -158,8 +164,9 @@ class StudentServiceTest {
 
   @Test
   void 存在しないコース名の場合は例外が発生すること() {
+    int sID = 1;
     Student student = new Student();
-    student.setId(1);
+    student.setId(sID);
 
     Course course = new Course();
     course.setCourseName("存在しないコース");
