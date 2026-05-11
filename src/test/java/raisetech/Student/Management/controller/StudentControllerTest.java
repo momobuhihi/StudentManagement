@@ -33,7 +33,7 @@ import raisetech.Student.Management.data.Student;
 import raisetech.Student.Management.domain.StudentDetail;
 import raisetech.Student.Management.service.StudentService;
 
-@WebMvcTest
+@WebMvcTest(StudentController.class)
 class StudentControllerTest {
 
   @Autowired
@@ -156,7 +156,7 @@ class StudentControllerTest {
             "phoneNumber": "09012345678",
             "region": "東京",
             "gender": "男性"
-            },　
+            },
             "studentsCourse": [{
               "courseName": "Javaコース"
             }]
