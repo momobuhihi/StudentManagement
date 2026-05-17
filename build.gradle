@@ -49,6 +49,10 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:4.0.1'
+
+    // H2
+    testImplementation 'com.h2database:h2:2.4.240'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
