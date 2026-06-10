@@ -25,7 +25,7 @@
 
   <!-- コース名からコースIDを取得 -->
   <select id="findCourseIdByName" resultType="int">
-    SELECT id FROM courses WHERE course_name = #{courseName}
+    SELECT id FROM students_courses WHERE course_name = #{courseName}
   </select>
 
   <!-- 受講生の新規登録 　受講生IDに関しては自動採番を行う -->
