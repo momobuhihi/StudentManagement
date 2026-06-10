@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 public class Course {
 
-  @Schema(description = "コースID", example = "1")
-  private Integer courseId;
+  @Schema(description = "受講生コース情報ID", example = "1")
+  private Integer id;
   @Schema(description = "受講生ID", example = "1")
   private Integer studentPk;
 

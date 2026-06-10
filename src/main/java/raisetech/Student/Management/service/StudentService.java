@@ -2,12 +2,14 @@ package raisetech.Student.Management.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import raisetech.Student.Management.data.Course;
+import raisetech.Student.Management.data.Status;
 import raisetech.Student.Management.data.Student;
+import raisetech.Student.Management.domain.ApplicationStatus;
+import raisetech.Student.Management.domain.StatusDetail;
 import raisetech.Student.Management.domain.StudentDetail;
 import raisetech.Student.Management.repository.StudentRepository;
 
@@ -66,32 +68,35 @@ public class StudentService {
     if (studentDetail == null || studentDetail.getStudent() == null) {
       throw new IllegalArgumentException("studentDetail or student is null");
     }
+    if (studentDetail.getStudentsCourse() == null || studentDetail.getStudentsCourse().isEmpty()) {
+      throw new IllegalArgumentException("studentsCourse is null or empty");
+    }
     Integer studentPk = insertStudent(studentDetail);
-    Course courseList = initStudentCourse(studentDetail, studentPk);
-    repository.insertCourse(courseList);
+    for (Course course : studentDetail.getStudentsCourse()) {
+      initStudentCourse(course, studentPk);
+      repository.insertCourse(course);
+
+      Status status = new Status();
+      status.setStudentCourseId(course.getId());
+      status.setStatus(ApplicationStatus.TEMPORARY.getLabel());
+      repository.insertStatus(status);
+    }
     return studentDetail;
   }
 
   /**
    * 受講生コース情報を登録する際の初期情報を設定する。
    *
-   * @param studentDetail
+   * @param course
    * @param studentPk
    * @return
    */
-  private @NonNull Course initStudentCourse(StudentDetail studentDetail, Integer studentPk) {
-    Course course = studentDetail.getStudentsCourse().get(0);
+  private void initStudentCourse(Course course, Integer studentPk) {
     course.setStudentPk(studentPk);
 
-    Integer courseId = repository.findCourseIdByName(course.getCourseName());
-    if (courseId == null) {
-      throw new IllegalArgumentException("存在しないコース名です: " + course.getCourseName());
-    }
-    course.setCourseId(courseId);
     LocalDate start = LocalDate.now();
     course.setStartDate(start);
     course.setEndDate(start.plusMonths(6));
-    return course;
   }
 
   /**
@@ -104,9 +109,10 @@ public class StudentService {
     Student student = studentDetail.getStudent();
     repository.updateStudent(student);
     if (studentDetail.getStudentsCourse() != null && !studentDetail.getStudentsCourse().isEmpty()) {
-      Course courseList = studentDetail.getStudentsCourse().get(0);
-      courseList.setStudentPk(student.getId());
-      repository.updateCourse(courseList);
+      for (Course course : studentDetail.getStudentsCourse()) {
+        course.setStudentPk(student.getId());
+        repository.updateCourse(course);
+      }
     }
   }
 
@@ -118,5 +124,30 @@ public class StudentService {
   @Transactional
   public void restoreStudent(int id) {
     repository.restoreStudent(id);
+  }
+
+  public StatusDetail updateStatus(Status status) {
+
+    Status currentStatus =
+        repository.searchStatus(status.getStudentCourseId());
+    if (currentStatus == null) {
+      throw new IllegalArgumentException(
+          "申込状況が存在しません");
+    }
+    ApplicationStatus current =
+        ApplicationStatus.fromLabel(currentStatus.getStatus());
+
+    ApplicationStatus next =
+        ApplicationStatus.fromLabel(status.getStatus());
+
+    if (!current.canTransitionTo(next)) {
+      throw new IllegalArgumentException(
+          current.getLabel() + "から" +
+              next.getLabel() + "には変更できません");
+    }
+
+    repository.updateStatus(status);
+    return repository.searchStatusDetail(
+        status.getStudentCourseId());
   }
 }

@@ -37,9 +37,9 @@
   </insert>
 
   <!-- 受講生コース情報の新規登録　受講生IDに関しては自動採番を行う -->
-  <insert id="insertCourse">
-    INSERT INTO students_courses (course_id, student_pk, course_name, start_date, end_date)
-    VALUES (#{courseId}, #{studentPk}, #{courseName}, #{startDate}, #{endDate})
+  <insert id="insertCourse" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO students_courses (student_pk, course_name, start_date, end_date)
+    VALUES (#{studentPk}, #{courseName}, #{startDate}, #{endDate})
   </insert>
 
   <!-- 受講生の更新 -->
@@ -70,4 +70,31 @@
   <update id="restoreStudent">
     UPDATE students SET is_deleted = false WHERE id = #{id}
   </update>
+
+  <!-- 申込状況の新規登録 -->
+  <insert id="insertStatus" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO application_statuses ( student_course_id, status )
+    VALUES ( #{studentCourseId}, #{status} )
+  </insert>
+
+  <!-- 受講生コース情報IDから申込状況を検索 -->
+  <select id="searchStatus" resultType="raisetech.Student.Management.data.Status">
+    SELECT id, student_course_id, status FROM application_statuses WHERE student_course_id =
+    #{studentCourseId}
+  </select>
+
+  <!-- 申込状況の更新 -->
+  <update id="updateStatus">
+    UPDATE application_statuses SET status = #{status} WHERE student_course_id = #{studentCourseId}
+  </update>
+
+  <!-- 申込状況詳細の検索 -->
+  <select id="searchStatusDetail"
+    resultType="raisetech.Student.Management.domain.StatusDetail">
+    SELECT s.id AS studentId, s.student_name AS studentName, sc.course_name AS courseName, aps.
+    status AS status
+    FROM application_statuses aps JOIN students_courses sc ON aps.student_course_id = sc.id JOIN
+    students s ON sc.student_pk = s.id
+    WHERE aps.student_course_id = #{studentCourseId}
+  </select>
 </mapper>

@@ -37,3 +37,8 @@ VALUES ('1', 1, 'Javaコース', '2026-01-01', '2026-07-01'),
        ('4', 4, 'Web開発コース', '2026-04-01', '2026-10-01'),
 
        ('5', 5, 'MyBatisコース', '2026-05-01', '2026-11-01');
+
+INSERT INTO application_statuses
+    (id, student_course_id, status)
+VALUES (1, 1, '仮申込'),
+       (2, 2, '受講中');

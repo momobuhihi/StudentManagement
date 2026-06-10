@@ -1,6 +1,8 @@
 package raisetech.Student.Management.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -8,7 +10,9 @@ import org.junit.jupiter.api.Test;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import raisetech.Student.Management.data.Course;
+import raisetech.Student.Management.data.Status;
 import raisetech.Student.Management.data.Student;
+import raisetech.Student.Management.domain.StatusDetail;
 
 @MybatisTest
 class StudentRepositoryTest {
@@ -69,7 +73,6 @@ class StudentRepositoryTest {
   @Test
   void 受講生コース情報を新規登録できること() {
     Course course = new Course();
-    course.setCourseId(1);
     course.setStudentPk(1);
     course.setCourseName("Javaコース");
     course.setStartDate(LocalDate.of(2026, 1, 1));
@@ -111,5 +114,53 @@ class StudentRepositoryTest {
     sut.restoreStudent(1);
     List<Student> actual = sut.search();
     assertThat(actual.size()).isEqualTo(4);
+  }
+
+  @Test
+  void 申込状況を登録できること() {
+    Status status = new Status();
+    status.setStudentCourseId(1);
+    status.setStatus("仮申込");
+
+    sut.insertStatus(status);
+
+    Status actual = sut.searchStatus(1);
+
+    assertNotNull(status.getId());
+    assertEquals(1, actual.getStudentCourseId());
+    assertEquals("仮申込", actual.getStatus());
+  }
+
+  @Test
+  void 受講生コース情報IDから申込状況を検索できること() {
+    Status status = sut.searchStatus(1);
+
+    assertEquals(1, status.getId());
+    assertEquals(1, status.getStudentCourseId());
+    assertEquals("仮申込", status.getStatus());
+  }
+
+  @Test
+  void 申込状況を更新できること() {
+    Status status = new Status();
+    status.setStudentCourseId(1);
+    status.setStatus("本申込");
+
+    sut.updateStatus(status);
+
+    Status actual = sut.searchStatus(1);
+
+    assertEquals("本申込", actual.getStatus());
+  }
+
+  @Test
+  void 申込状況詳細を検索できること() {
+    StatusDetail detail =
+        sut.searchStatusDetail(1);
+
+    assertEquals(1, detail.getStudentId());
+    assertEquals("山田太郎", detail.getStudentName());
+    assertEquals("Javaコース", detail.getCourseName());
+    assertEquals("仮申込", detail.getStatus());
   }
 }
