@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.Student.Management.controller.converter.CourseConverter;
 import raisetech.Student.Management.controller.converter.StudentConverter;
+import raisetech.Student.Management.data.Status;
 import raisetech.Student.Management.domain.CourseDetail;
+import raisetech.Student.Management.domain.StatusDetail;
 import raisetech.Student.Management.domain.StudentDetail;
 import raisetech.Student.Management.service.StudentService;
 
@@ -130,5 +132,11 @@ public class StudentController {
   public ResponseEntity<String> restoreStudent(@PathVariable @Positive int id) {
     service.restoreStudent(id);
     return ResponseEntity.ok("復元処理が成功しました。");
+  }
+
+  @PatchMapping("/updateStatus")
+  public ResponseEntity<StatusDetail> updateStatus(@RequestBody Status status) {
+    StatusDetail updatedStatus = service.updateStatus(status);
+    return ResponseEntity.ok(updatedStatus);
   }
 }

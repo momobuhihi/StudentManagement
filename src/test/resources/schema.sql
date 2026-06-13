@@ -22,3 +22,13 @@ CREATE TABLE IF NOT EXISTS students_courses
     start_date DATE,
     end_date DATE
 );
+
+CREATE TABLE application_statuses (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  student_course_id INT NOT NULL,
+  status VARCHAR(20) NOT NULL,
+  FOREIGN KEY (student_course_id)
+  REFERENCES students_courses(id),
+  UNIQUE (student_course_id)
+);
+

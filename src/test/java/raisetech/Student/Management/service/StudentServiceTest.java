@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,10 +15,13 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import raisetech.Student.Management.data.Course;
+import raisetech.Student.Management.data.Status;
 import raisetech.Student.Management.data.Student;
+import raisetech.Student.Management.domain.StatusDetail;
 import raisetech.Student.Management.domain.StudentDetail;
 import raisetech.Student.Management.repository.StudentRepository;
 
@@ -65,19 +70,21 @@ class StudentServiceTest {
   @Test
   void 受講生の登録が動作すること() {
     int sID = 100;
+
     Student student = new Student();
     student.setId(sID);
+
     Course course = new Course();
     course.setCourseName("Javaコース");
+
     StudentDetail studentDetail = new StudentDetail(student, List.of(course));
 
-    when(repository.findCourseIdByName("Javaコース")).thenReturn(sID);
     StudentDetail actual = sut.register(studentDetail);
+
     assertEquals(sID, actual.getStudent().getId());
     assertEquals("Javaコース", actual.getStudentsCourse().get(0).getCourseName());
 
     verify(repository).insertStudent(student);
-    verify(repository).findCourseIdByName("Javaコース");
     verify(repository).insertCourse(course);
   }
 
@@ -144,18 +151,19 @@ class StudentServiceTest {
   @Test
   void コース情報が正しく初期化されること() {
     int sID = 100;
-    int cID = 900;
+
     Student student = new Student();
     student.setId(sID);
+
     Course course = new Course();
     course.setCourseName("Javaコース");
+
     StudentDetail studentDetail = new StudentDetail(student, List.of(course));
 
-    when(repository.findCourseIdByName("Javaコース")).thenReturn(cID);
     sut.register(studentDetail);
 
     assertEquals(sID, course.getStudentPk());
-    assertEquals(cID, course.getCourseId());
+    assertEquals("Javaコース", course.getCourseName());
     assertNotNull(course.getStartDate());
     assertNotNull(course.getEndDate());
 
@@ -163,24 +171,224 @@ class StudentServiceTest {
   }
 
   @Test
-  void 存在しないコース名の場合は例外が発生すること() {
-    int sID = 1;
+  void 複数コースを登録できること() {
     Student student = new Student();
-    student.setId(sID);
+    student.setId(1);
+
+    Course java = new Course();
+    java.setCourseName("Javaコース");
+
+    Course aws = new Course();
+    aws.setCourseName("AWSコース");
+
+    StudentDetail studentDetail =
+        new StudentDetail(student, List.of(java, aws));
+
+    sut.register(studentDetail);
+
+    verify(repository, times(2)).insertCourse(any(Course.class));
+  }
+
+  @Test
+  void 登録時に仮申込が登録されること() {
+
+    Student student = new Student();
+    student.setId(1);
 
     Course course = new Course();
-    course.setCourseName("存在しないコース");
+    course.setId(10);
+    course.setCourseName("Javaコース");
 
-    StudentDetail studentDetail = new StudentDetail(student, List.of(course));
+    StudentDetail studentDetail =
+        new StudentDetail(student, List.of(course));
 
-    when(repository.findCourseIdByName("存在しないコース")).thenReturn(null);
+    sut.register(studentDetail);
+
+    ArgumentCaptor<Status> captor =
+        ArgumentCaptor.forClass(Status.class);
+
+    verify(repository).insertStatus(captor.capture());
+
+    Status status = captor.getValue();
+
+    assertEquals(10, status.getStudentCourseId());
+    assertEquals("仮申込", status.getStatus());
+  }
+
+  @Test
+  void 仮申込から本申込に更新できること() {
+    Status request = new Status();
+    request.setStudentCourseId(33);
+    request.setStatus("本申込");
+
+    Status currentStatus = new Status();
+    currentStatus.setStudentCourseId(33);
+    currentStatus.setStatus("仮申込");
+
+    StatusDetail statusDetail = new StatusDetail();
+    statusDetail.setStudentId(4);
+    statusDetail.setStudentName("山田太郎");
+    statusDetail.setCourseName("AWSコース");
+    statusDetail.setStatus("本申込");
+
+    when(repository.searchStatus(33)).thenReturn(currentStatus);
+    when(repository.searchStatusDetail(33)).thenReturn(statusDetail);
+
+    StatusDetail result = sut.updateStatus(request);
+
+    assertEquals(4, result.getStudentId());
+    assertEquals("山田太郎", result.getStudentName());
+    assertEquals("AWSコース", result.getCourseName());
+    assertEquals("本申込", result.getStatus());
+
+    verify(repository).updateStatus(request);
+    verify(repository).searchStatus(33);
+    verify(repository).searchStatusDetail(33);
+  }
+
+  @Test
+  void 本申込から受講中に更新できること() {
+    Status request = new Status();
+    request.setStudentCourseId(33);
+    request.setStatus("受講中");
+
+    Status currentStatus = new Status();
+    currentStatus.setStudentCourseId(33);
+    currentStatus.setStatus("本申込");
+
+    StatusDetail statusDetail = new StatusDetail();
+    statusDetail.setStudentId(4);
+    statusDetail.setStudentName("山田太郎");
+    statusDetail.setCourseName("AWSコース");
+    statusDetail.setStatus("受講中");
+
+    when(repository.searchStatus(33)).thenReturn(currentStatus);
+    when(repository.searchStatusDetail(33)).thenReturn(statusDetail);
+
+    StatusDetail result = sut.updateStatus(request);
+
+    assertEquals("受講中", result.getStatus());
+
+    verify(repository).updateStatus(request);
+  }
+
+  @Test
+  void 受講中から受講終了に更新できること() {
+    Status request = new Status();
+    request.setStudentCourseId(33);
+    request.setStatus("受講終了");
+
+    Status currentStatus = new Status();
+    currentStatus.setStudentCourseId(33);
+    currentStatus.setStatus("受講中");
+
+    StatusDetail statusDetail = new StatusDetail();
+    statusDetail.setStudentId(4);
+    statusDetail.setStudentName("山田太郎");
+    statusDetail.setCourseName("AWSコース");
+    statusDetail.setStatus("受講終了");
+
+    when(repository.searchStatus(33)).thenReturn(currentStatus);
+    when(repository.searchStatusDetail(33)).thenReturn(statusDetail);
+
+    StatusDetail result = sut.updateStatus(request);
+
+    assertEquals("受講終了", result.getStatus());
+
+    verify(repository).updateStatus(request);
+  }
+
+  @Test
+  void 本申込から仮申込には更新できないこと() {
+    Status request = new Status();
+    request.setStudentCourseId(33);
+    request.setStatus("仮申込");
+
+    Status currentStatus = new Status();
+    currentStatus.setStudentCourseId(33);
+    currentStatus.setStatus("本申込");
+
+    when(repository.searchStatus(33)).thenReturn(currentStatus);
 
     assertThrows(IllegalArgumentException.class, () -> {
-      sut.register(studentDetail);
+      sut.updateStatus(request);
     });
 
-    verify(repository).insertStudent(student);
-    verify(repository).findCourseIdByName("存在しないコース");
-    verify(repository, never()).insertCourse(any());
+    verify(repository, never()).updateStatus(any(Status.class));
+    verify(repository, never()).searchStatusDetail(anyInt());
+  }
+
+  @Test
+  void 受講終了から受講中には更新できないこと() {
+    Status request = new Status();
+    request.setStudentCourseId(33);
+    request.setStatus("受講中");
+
+    Status currentStatus = new Status();
+    currentStatus.setStudentCourseId(33);
+    currentStatus.setStatus("受講終了");
+
+    when(repository.searchStatus(33)).thenReturn(currentStatus);
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      sut.updateStatus(request);
+    });
+
+    verify(repository, never()).updateStatus(any(Status.class));
+    verify(repository, never()).searchStatusDetail(anyInt());
+  }
+
+  @Test
+  void 存在しない受講生コース情報IDの場合は例外が発生すること() {
+    Status request = new Status();
+    request.setStudentCourseId(999);
+    request.setStatus("本申込");
+
+    when(repository.searchStatus(999)).thenReturn(null);
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      sut.updateStatus(request);
+    });
+
+    verify(repository, never()).updateStatus(any(Status.class));
+  }
+
+  @Test
+  void 不正な申込状況の場合は例外が発生すること() {
+    Status request = new Status();
+    request.setStudentCourseId(33);
+    request.setStatus("不明な状態");
+
+    Status currentStatus = new Status();
+    currentStatus.setStudentCourseId(33);
+    currentStatus.setStatus("仮申込");
+
+    when(repository.searchStatus(33)).thenReturn(currentStatus);
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      sut.updateStatus(request);
+    });
+
+    verify(repository, never()).updateStatus(any(Status.class));
+  }
+
+  @Test
+  void 仮申込から受講終了には更新できないこと() {
+    Status request = new Status();
+    request.setStudentCourseId(33);
+    request.setStatus("受講終了");
+
+    Status currentStatus = new Status();
+    currentStatus.setStudentCourseId(33);
+    currentStatus.setStatus("仮申込");
+
+    when(repository.searchStatus(33)).thenReturn(currentStatus);
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      sut.updateStatus(request);
+    });
+
+    verify(repository, never()).updateStatus(any(Status.class));
+    verify(repository, never()).searchStatusDetail(anyInt());
   }
 }

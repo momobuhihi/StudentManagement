@@ -24,12 +24,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import raisetech.Student.Management.controller.converter.CourseConverter;
 import raisetech.Student.Management.controller.converter.StudentConverter;
 import raisetech.Student.Management.controller.handler.TestException;
+import raisetech.Student.Management.data.Status;
 import raisetech.Student.Management.data.Student;
+import raisetech.Student.Management.domain.StatusDetail;
 import raisetech.Student.Management.domain.StudentDetail;
 import raisetech.Student.Management.service.StudentService;
 
@@ -342,5 +345,71 @@ class StudentControllerTest {
         .andExpect(status().isBadRequest());
 
     verify(service, times(0)).restoreStudent(anyInt());
+  }
+
+  @Test
+  void 申込状況を更新できること() throws Exception {
+    StatusDetail response = new StatusDetail();
+    response.setStudentId(4);
+    response.setStudentName("山田太郎");
+    response.setCourseName("AWSコース");
+    response.setStatus("本申込");
+
+    when(service.updateStatus(any(Status.class))).thenReturn(response);
+
+    mockMvc.perform(patch("/updateStatus")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                  "studentCourseId": 33,
+                  "status": "本申込"
+                }
+                """))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.studentId").value(4))
+        .andExpect(jsonPath("$.studentName").value("山田太郎"))
+        .andExpect(jsonPath("$.courseName").value("AWSコース"))
+        .andExpect(jsonPath("$.status").value("本申込"));
+
+    verify(service).updateStatus(any(Status.class));
+  }
+
+  @Test
+  void 不正な状態遷移の場合は400エラーになること() throws Exception {
+
+    when(service.updateStatus(any(Status.class)))
+        .thenThrow(new IllegalArgumentException(
+            "本申込から仮申込には変更できません"));
+
+    mockMvc.perform(patch("/updateStatus")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                  "studentCourseId": 33,
+                  "status": "仮申込"
+                }
+                """))
+        .andExpect(status().isBadRequest());
+
+    verify(service).updateStatus(any(Status.class));
+  }
+
+  @Test
+  void 存在しない受講生コース情報IDの場合は400エラーになること() throws Exception {
+
+    when(service.updateStatus(any(Status.class)))
+        .thenThrow(new IllegalArgumentException("申込状況が存在しません"));
+
+    mockMvc.perform(patch("/updateStatus")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {
+                  "studentCourseId": 999,
+                  "status": "本申込"
+                }
+                """))
+        .andExpect(status().isBadRequest());
+
+    verify(service).updateStatus(any(Status.class));
   }
 }
