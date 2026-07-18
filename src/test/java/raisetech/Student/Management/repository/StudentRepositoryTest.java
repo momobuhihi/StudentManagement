@@ -119,15 +119,15 @@ class StudentRepositoryTest {
   @Test
   void 申込状況を登録できること() {
     Status status = new Status();
-    status.setStudentCourseId(1);
+    status.setStudentCourseId(3);
     status.setStatus("仮申込");
 
     sut.insertStatus(status);
 
-    Status actual = sut.searchStatus(1);
+    Status actual = sut.searchStatus(3);
 
     assertNotNull(status.getId());
-    assertEquals(1, actual.getStudentCourseId());
+    assertEquals(3, actual.getStudentCourseId());
     assertEquals("仮申込", actual.getStatus());
   }
 

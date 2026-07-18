@@ -12,11 +12,10 @@ public class CourseConverter {
   public List<CourseDetail> convertCourseDetails(List<Course> enrollments) {
 
     return enrollments.stream()
-        .collect(Collectors.groupingBy(Course::getCourseId))
+        .collect(Collectors.groupingBy(Course::getCourseName))
         .entrySet().stream()
         .map(entry -> new CourseDetail(
             entry.getKey(),
-            entry.getValue().get(0).getCourseName(),
             entry.getValue()
         ))
         .toList();

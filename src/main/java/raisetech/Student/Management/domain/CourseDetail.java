@@ -13,7 +13,6 @@ import raisetech.Student.Management.data.Course;
 @NoArgsConstructor
 public class CourseDetail {
 
-  private Integer courseId;
   private String courseName;
   private List<Course> enrollments;
 
